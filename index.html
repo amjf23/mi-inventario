@@ -1,3 +1,6 @@
+
+Copiar
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -14,7 +17,7 @@
 </head>
 <body>
   <div id="root"></div>
-
+ 
   <!-- Firebase compat (global) -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
@@ -29,7 +32,7 @@
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
-
+ 
     window.loadItemsFromDB = async function() {
       try {
         const snap = await db.collection("items").get();
@@ -50,41 +53,12 @@
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <!-- Babel for JSX -->
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
+ 
   <script type="text/babel">
 const { useState, useEffect, useMemo, useRef } = React;
-
-const firebaseConfig = {
-  apiKey: "AIzaSyAvSeP31pyCfZ7qrm3qniyNg8Eu9HBZMCI",
-  authDomain: "mi-inventario-468c6.firebaseapp.com",
-  projectId: "mi-inventario-468c6",
-  storageBucket: "mi-inventario-468c6.firebasestorage.app",
-  messagingSenderId: "689554039981",
-  appId: "1:689554039981:web:da23024ac3a6939c929224"
-};
-
-const firebaseApp = initializeApp(firebaseConfig);
-const db = getFirestore(firebaseApp);
-
-window._loadItemsFromDB = async function() {
-  try {
-    const snap = await getDocs(collection(db, "items"));
-    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
-  } catch(e) { console.error("Error cargando datos:", e); return []; }
-}
-
-window._saveItemToDB = async function(item) {
-  try {
-    await setDoc(doc(db, "items", item.id), item);
-  } catch(e) { console.error("Error guardando:", e); }
-}
-
-window._deleteItemFromDB = async function(id) {
-  try {
-    await deleteDoc(doc(db, "items", id));
-  } catch(e) { console.error("Error borrando:", e); }
-}
-
+ 
+// Firebase functions available via window.loadItemsFromDB etc (loaded above)
+ 
 const CATEGORIES = {
   libros: { label: "Libros",        icon: "📚", accent: "#c8784a" },
   juegos: { label: "Juegos",        icon: "🎮", accent: "#4a9c7e" },
@@ -92,7 +66,7 @@ const CATEGORIES = {
   musica: { label: "Música",        icon: "🎵", accent: "#c45a8a" },
   varios: { label: "Varios",        icon: "📦", accent: "#b06090" },
 };
-
+ 
 const STATES = {
   libros: ["Sin leer", "Leyendo", "Leído"],
   juegos: ["Sin jugar", "Jugando", "Completado"],
@@ -100,20 +74,20 @@ const STATES = {
   musica: [],
   varios: ["Pendiente", "En uso", "Archivado"],
 };
-
+ 
 const CONSOLAS    = ["PS4", "PS5", "Nintendo Switch", "Otra"];
 const LOCATIONS   = ["Billy Cristalera", "Estantería blanca", "Mueble TV", "Billy estrecha 1", "Billy estrecha 2", "Trastero", "Armario"];
 const DVD_GENRES  = ["Acción / Aventura","Comedia","Drama","Terror","Ciencia ficción","Animación","Documental","Romance","Otra"];
 const MUSIC_GENRES= ["Pop","Rock","Metal","Jazz","Clásica","Electrónica","Hip-hop","R&B","Folk","Indie","Otro"];
 const MUSIC_FMTS  = ["Vinilo","CD"];
-
+ 
 const STORAGE_KEY = "inventario_personal_v3";
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2);
-
+ 
 // Data is now stored in Firebase
 function loadItems() { return []; }
 function saveItems(items) { /* handled by Firebase */ }
-
+ 
 const EMPTY_ITEM = {
   id: null, category: "libros", title: "", favorite: false,
   state: "Sin leer", location: "", cover: "", notes: "",
@@ -129,12 +103,12 @@ const EMPTY_ITEM = {
   // varios
   itemType: "",
 };
-
+ 
 const themes = {
   light: { bg:"#f5f2ec", bg2:"#edeae0", surface:"#ffffff", border:"#ddd8cc", text:"#2a2535", text2:"#7a7585", accent:"#c8784a" },
   dark:  { bg:"#13121a", bg2:"#1c1b26", surface:"#1f1e2c", border:"#38354e", text:"#e8e4f0", text2:"#9d99b5", accent:"#c8784a" },
 };
-
+ 
 function stateColor(state) {
   const m = {
     "Sin leer":"#9d9d9d","Leyendo":"#c8784a","Leído":"#4a9c6e",
@@ -144,11 +118,11 @@ function stateColor(state) {
   };
   return m[state] || "#9d9d9d";
 }
-
+ 
 function truncate(s, n) { return s && s.length > n ? s.slice(0,n)+"…" : s||""; }
-
+ 
 // ── Export / Import ───────────────────────────────────────────────────────────
-
+ 
 function exportToExcel(items) {
   const esc = v => String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   const cell = v => `<Cell><Data ss:Type="String">${esc(v)}</Data></Cell>`;
@@ -177,14 +151,14 @@ function exportToExcel(items) {
   const a = document.createElement('a'); a.href=url; a.download='mi_coleccion.xls'; a.click();
   URL.revokeObjectURL(url);
 }
-
+ 
 function exportToJSON(items) {
   const blob = new Blob([JSON.stringify(items,null,2)], { type:'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a'); a.href=url; a.download='mi_coleccion_backup.json'; a.click();
   URL.revokeObjectURL(url);
 }
-
+ 
 function importFromJSON(file, onSuccess) {
   const reader = new FileReader();
   reader.onload = e => {
@@ -196,9 +170,9 @@ function importFromJSON(file, onSuccess) {
   };
   reader.readAsText(file);
 }
-
+ 
 // ── Shared UI ─────────────────────────────────────────────────────────────────
-
+ 
 function Overlay({ children, onClose }) {
   return (
     <div onClick={onClose} style={{ position:'fixed',inset:0,background:'rgba(0,0,0,0.58)',zIndex:200,display:'flex',alignItems:'flex-end',justifyContent:'center' }}>
@@ -208,7 +182,7 @@ function Overlay({ children, onClose }) {
     </div>
   );
 }
-
+ 
 function Lbl({ children, t }) {
   return <p style={{ fontSize:11,fontWeight:700,color:t.text2,textTransform:'uppercase',letterSpacing:0.8,marginBottom:5 }}>{children}</p>;
 }
@@ -227,9 +201,9 @@ function Sel({ value, onChange, options, t }) {
 function CloseBtn({ onClick }) {
   return <button onClick={onClick} style={{ background:'rgba(128,128,128,0.15)',border:'none',borderRadius:'50%',width:30,height:30,fontSize:14,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center' }}>✕</button>;
 }
-
+ 
 // ── Item Card ─────────────────────────────────────────────────────────────────
-
+ 
 function ItemCard({ item, t, onOpen, onToggleFav }) {
   const cat = CATEGORIES[item.category];
   return (
@@ -277,9 +251,9 @@ function ItemCard({ item, t, onOpen, onToggleFav }) {
     </div>
   );
 }
-
+ 
 // ── Saga Card (for saga view) ─────────────────────────────────────────────────
-
+ 
 function SagaCard({ sagaName, books, t, onOpen }) {
   const complete = books[0]?.sagaComplete;
   const sorted = [...books].sort((a,b) => (parseInt(a.tomo)||0)-(parseInt(b.tomo)||0));
@@ -305,9 +279,9 @@ function SagaCard({ sagaName, books, t, onOpen }) {
     </div>
   );
 }
-
+ 
 // ── Saga Detail Modal ─────────────────────────────────────────────────────────
-
+ 
 function SagaDetailModal({ sagaName, books, t, onOpenBook, onClose }) {
   const sorted = [...books].sort((a,b) => (parseInt(a.tomo)||0)-(parseInt(b.tomo)||0));
   const complete = books[0]?.sagaComplete;
@@ -341,9 +315,9 @@ function SagaDetailModal({ sagaName, books, t, onOpenBook, onClose }) {
     </Overlay>
   );
 }
-
+ 
 // ── Detail Modal ──────────────────────────────────────────────────────────────
-
+ 
 function DetailModal({ item, t, onEdit, onToggleFav, onClose }) {
   const cat = CATEGORIES[item.category];
   const rows = [
@@ -363,7 +337,7 @@ function DetailModal({ item, t, onEdit, onToggleFav, onClose }) {
     item.year       && ['Año adquisición', item.year],
     item.price && item.price!=='0' && ['Precio', item.price+' €'],
   ].filter(Boolean);
-
+ 
   return (
     <Overlay onClose={onClose}>
       <div style={{ background:t.surface,borderRadius:20,overflow:'hidden',maxHeight:'90vh',overflowY:'auto' }}>
@@ -403,15 +377,15 @@ function DetailModal({ item, t, onEdit, onToggleFav, onClose }) {
     </Overlay>
   );
 }
-
+ 
 // ── Form Modal ────────────────────────────────────────────────────────────────
-
+ 
 function FormModal({ item, t, onSave, onDelete, onClose }) {
   const [form, setForm] = useState({...item});
   const set = (k,v) => setForm(f => ({...f,[k]:v}));
   const cat = CATEGORIES[form.category];
   const isNew = !form.id;
-
+ 
   const handleCover = e => {
     const file = e.target.files[0]; if (!file) return;
     const reader = new FileReader();
@@ -423,7 +397,7 @@ function FormModal({ item, t, onSave, onDelete, onClose }) {
     if (!form.title.trim()) { alert('El título es obligatorio'); return; }
     onSave({...form, state: form.state || STATES[form.category][0]||''});
   };
-
+ 
   return (
     <Overlay onClose={onClose}>
       <div style={{ background:t.surface,borderRadius:20,maxHeight:'92vh',overflowY:'auto' }}>
@@ -431,9 +405,9 @@ function FormModal({ item, t, onSave, onDelete, onClose }) {
           <h2 style={{ fontFamily:"'Playfair Display',serif",fontSize:19,fontWeight:700 }}>{isNew?'Añadir objeto':'Editar'}</h2>
           <CloseBtn onClick={onClose} />
         </div>
-
+ 
         <div style={{ padding:'16px 20px 24px',display:'flex',flexDirection:'column',gap:14 }}>
-
+ 
           {/* Category */}
           <div>
             <Lbl t={t}>Categoría</Lbl>
@@ -446,7 +420,7 @@ function FormModal({ item, t, onSave, onDelete, onClose }) {
               ))}
             </div>
           </div>
-
+ 
           {/* Cover + title */}
           <div style={{ display:'flex',gap:14,alignItems:'flex-start' }}>
             <div>
@@ -465,7 +439,7 @@ function FormModal({ item, t, onSave, onDelete, onClose }) {
               {(form.category==='libros'||form.category==='juegos') && <div><Lbl t={t}>Saga</Lbl><Inp value={form.saga} onChange={v => set('saga',v)} placeholder="Saga (opcional)..." t={t} /></div>}
             </div>
           </div>
-
+ 
           {/* Libros specific */}
           {form.category==='libros' && (
             <>
@@ -486,12 +460,12 @@ function FormModal({ item, t, onSave, onDelete, onClose }) {
               <div><Lbl t={t}>Temática</Lbl><Inp value={form.genre} onChange={v => set('genre',v)} placeholder="Ej: Filosofía, Fantasía épica..." t={t} /></div>
             </>
           )}
-
+ 
           {/* Juegos specific */}
           {form.category==='juegos' && (
             <div><Lbl t={t}>Consola</Lbl><Sel value={form.console} onChange={v => set('console',v)} options={CONSOLAS} t={t} /></div>
           )}
-
+ 
           {/* DVDs specific */}
           {form.category==='dvds' && (
             <>
@@ -516,7 +490,7 @@ function FormModal({ item, t, onSave, onDelete, onClose }) {
               <div><Lbl t={t}>Género</Lbl><Sel value={form.dvdGenre} onChange={v => set('dvdGenre',v)} options={['', ...DVD_GENRES]} t={t} /></div>
             </>
           )}
-
+ 
           {/* Música specific */}
           {form.category==='musica' && (
             <>
@@ -533,36 +507,36 @@ function FormModal({ item, t, onSave, onDelete, onClose }) {
               <div><Lbl t={t}>Género musical</Lbl><Sel value={form.musicGenre} onChange={v => set('musicGenre',v)} options={['', ...MUSIC_GENRES]} t={t} /></div>
             </>
           )}
-
+ 
           {/* Varios specific */}
           {form.category==='varios' && (
             <div><Lbl t={t}>Tipo de objeto</Lbl><Inp value={form.itemType} onChange={v => set('itemType',v)} placeholder="Ej: Figura, Cómic..." t={t} /></div>
           )}
-
+ 
           {/* Common: Estado (not for música) */}
           {form.category!=='musica' && (
             <div><Lbl t={t}>Estado</Lbl><Sel value={form.state} onChange={v => set('state',v)} options={STATES[form.category]} t={t} /></div>
           )}
-
+ 
           <div><Lbl t={t}>Ubicación</Lbl><Sel value={form.location} onChange={v => set('location',v)} options={['', ...LOCATIONS]} t={t} /></div>
-
+ 
           <div style={{ display:'flex',gap:10 }}>
             <div style={{ flex:1 }}><Lbl t={t}>Año adquisición</Lbl><Inp value={form.year} onChange={v => set('year',v)} placeholder="2024" t={t} type="number" /></div>
             {form.category!=='musica' && <div style={{ flex:1 }}><Lbl t={t}>Precio (€)</Lbl><Inp value={form.price} onChange={v => set('price',v)} placeholder="0" t={t} type="number" /></div>}
           </div>
-
+ 
           <div>
             <Lbl t={t}>Notas</Lbl>
             <textarea value={form.notes} onChange={e => set('notes',e.target.value)} placeholder="Cualquier anotación..."
               style={{ width:'100%',minHeight:76,padding:'10px 12px',borderRadius:10,border:`1.5px solid ${t.border}`,background:t.bg2,color:t.text,fontSize:14,resize:'vertical',outline:'none',fontFamily:"'Nunito',sans-serif" }} />
           </div>
-
+ 
           <div style={{ display:'flex',alignItems:'center',gap:10 }}>
             <input type="checkbox" id="fav-chk" checked={form.favorite} onChange={e => set('favorite',e.target.checked)}
               style={{ width:18,height:18,accentColor:'#f5c518',cursor:'pointer' }} />
             <label htmlFor="fav-chk" style={{ fontSize:14,cursor:'pointer' }}>⭐ Marcar como favorito</label>
           </div>
-
+ 
           <div style={{ display:'flex',gap:10,marginTop:4 }}>
             {!isNew && onDelete && (
               <button onClick={() => { if (window.confirm('¿Eliminar este objeto?')) onDelete(); }}
@@ -578,9 +552,9 @@ function FormModal({ item, t, onSave, onDelete, onClose }) {
     </Overlay>
   );
 }
-
+ 
 // ── Stats Modal ───────────────────────────────────────────────────────────────
-
+ 
 function StatsModal({ items, t, onClose }) {
   const total = items.length;
   const favs  = items.filter(i => i.favorite).length;
@@ -628,9 +602,9 @@ function StatsModal({ items, t, onClose }) {
     </Overlay>
   );
 }
-
+ 
 // ── Data Modal ────────────────────────────────────────────────────────────────
-
+ 
 function DataModal({ items, t, onExcelExport, onJSONExport, onImport, onClose }) {
   const fileRef = useRef(null);
   return (
@@ -663,19 +637,19 @@ function DataModal({ items, t, onExcelExport, onJSONExport, onImport, onClose })
     </Overlay>
   );
 }
-
+ 
 // ── Main App ──────────────────────────────────────────────────────────────────
-
+ 
 function App() {
   const [dark, setDark] = useState(() => {
     const s = localStorage.getItem('inv_dark');
     return s !== null ? JSON.parse(s) : window.matchMedia('(prefers-color-scheme: dark)').matches;
   });
   const toggleDark = () => setDark(d => { localStorage.setItem('inv_dark', !d); return !d; });
-
+ 
   const [items, setItems]         = useState([]);
   const [loading, setLoading]     = useState(true);
-
+ 
   useEffect(() => {
     window.loadItemsFromDB().then(data => {
       setItems(data);
@@ -691,7 +665,7 @@ function App() {
   const [statsOpen, setStatsOpen] = useState(false);
   const [dataOpen, setDataOpen]   = useState(false);
   const [sagaModal, setSagaModal] = useState(null); // saga name
-
+ 
   const prevItemsRef = useRef(null);
   useEffect(() => {
     if (prevItemsRef.current === null) { prevItemsRef.current = items; return; }
@@ -707,13 +681,13 @@ function App() {
     });
     prevItemsRef.current = items;
   }, [items]);
-
+ 
   const t = dark ? themes.dark : themes.light;
-
+ 
   const stateOptions = tab==='all'
     ? [...new Set(Object.values(STATES).flat())]
     : STATES[tab] || [];
-
+ 
   const filtered = useMemo(() => {
     let list = items;
     if (tab!=='all') list = list.filter(i => i.category===tab);
@@ -732,7 +706,7 @@ function App() {
     }
     return [...list].sort((a,b) => (b.favorite?1:0)-(a.favorite?1:0));
   }, [items, tab, filterState, search]);
-
+ 
   // Sagas grouping (only for libros with saga)
   const sagasMap = useMemo(() => {
     const books = items.filter(i => i.category==='libros' && i.saga);
@@ -740,7 +714,7 @@ function App() {
     books.forEach(b => { if (!map[b.saga]) map[b.saga]=[]; map[b.saga].push(b); });
     return map;
   }, [items]);
-
+ 
   const saveItem = item => {
     if (item.id) setItems(prev => prev.map(i => i.id===item.id ? item : i));
     else setItems(prev => [...prev, {...item, id:uid()}]);
@@ -748,9 +722,9 @@ function App() {
   };
   const deleteItem = id => { setItems(prev => prev.filter(i => i.id!==id)); setModal(null); setEditItem(null); };
   const toggleFav  = id => setItems(prev => prev.map(i => i.id===id ? {...i,favorite:!i.favorite} : i));
-
+ 
   const sagaBooks = sagaModal ? (sagasMap[sagaModal]||[]) : [];
-
+ 
   return (
     <div style={{ minHeight:'100vh',background:t.bg,color:t.text,fontFamily:"'Nunito',sans-serif",transition:'background 0.3s,color 0.3s' }}>
       <style>{[
@@ -760,7 +734,7 @@ function App() {
         `::-webkit-scrollbar-thumb{background:${t.border};border-radius:4px;}`,
         "input,textarea,select,button{font-family:'Nunito',sans-serif;}",
       ].join('\n')}</style>
-
+ 
       {loading && (
         <div style={{ position:'fixed',inset:0,background:t.bg,zIndex:300,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:16 }}>
           <div style={{ fontSize:48 }}>📚</div>
@@ -785,9 +759,9 @@ function App() {
           </div>
         </div>
       </div>
-
+ 
       <div style={{ maxWidth:640,margin:'0 auto',padding:'0 14px 100px' }}>
-
+ 
         {/* Tabs */}
         <div style={{ display:'flex',gap:8,padding:'14px 0 8px',overflowX:'auto',scrollbarWidth:'none' }}>
           {[['all','Todos','🗂️'],...Object.entries(CATEGORIES).map(([k,v])=>[k,v.label,v.icon])].map(([key,label,icon]) => {
@@ -801,7 +775,7 @@ function App() {
             );
           })}
         </div>
-
+ 
         {/* Libros sub-view toggle */}
         {tab==='libros' && (
           <div style={{ display:'flex',gap:8,marginBottom:8 }}>
@@ -813,7 +787,7 @@ function App() {
             ))}
           </div>
         )}
-
+ 
         {/* Search + filter (not shown in saga view) */}
         {librosView!=='sagas' && (
           <div style={{ display:'flex',gap:8,margin:'4px 0 14px' }}>
@@ -831,7 +805,7 @@ function App() {
             )}
           </div>
         )}
-
+ 
         {/* Saga view */}
         {tab==='libros' && librosView==='sagas' ? (
           Object.keys(sagasMap).length===0 ? (
@@ -879,7 +853,7 @@ function App() {
           )
         )}
       </div>
-
+ 
       {/* Modals */}
       {modal==='form' && editItem && (
         <FormModal item={editItem} t={t} onSave={saveItem}
@@ -906,8 +880,8 @@ function App() {
     </div>
   );
 }
-
-
+ 
+ 
     const root = ReactDOM.createRoot(document.getElementById("root"));
     root.render(<App />);
   </script>
