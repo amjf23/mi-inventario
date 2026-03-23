@@ -15,16 +15,10 @@
 <body>
   <div id="root"></div>
 
-  <!-- React -->
-  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  <!-- Babel for JSX -->
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <!-- Firebase -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, setDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
+  <!-- Firebase compat (global) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script>
     const firebaseConfig = {
       apiKey: "AIzaSyAvSeP31pyCfZ7qrm3qniyNg8Eu9HBZMCI",
       authDomain: "mi-inventario-468c6.firebaseapp.com",
@@ -33,28 +27,29 @@
       messagingSenderId: "689554039981",
       appId: "1:689554039981:web:da23024ac3a6939c929224"
     };
-
-    const firebaseApp = initializeApp(firebaseConfig);
-    const db = getFirestore(firebaseApp);
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
 
     window.loadItemsFromDB = async function() {
       try {
-        const snap = await getDocs(collection(db, "items"));
+        const snap = await db.collection("items").get();
         return snap.docs.map(d => ({ id: d.id, ...d.data() }));
       } catch(e) { console.error("Error cargando:", e); return []; }
     };
     window.saveItemToDB = async function(item) {
-      try { await setDoc(doc(db, "items", item.id), item); }
+      try { await db.collection("items").doc(item.id).set(item); }
       catch(e) { console.error("Error guardando:", e); }
     };
     window.deleteItemFromDB = async function(id) {
-      try { await deleteDoc(doc(db, "items", id)); }
+      try { await db.collection("items").doc(id).delete(); }
       catch(e) { console.error("Error borrando:", e); }
     };
-
-    window.firebaseReady = true;
-    window.dispatchEvent(new Event("firebaseReady"));
   </script>
+  <!-- React -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <!-- Babel for JSX -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
   <script type="text/babel">
 const { useState, useEffect, useMemo, useRef } = React;
